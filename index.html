@@ -1,0 +1,1023 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Software Engineering 1 - Master Reviewer</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172033;
+      --muted: #5f6b7d;
+      --surface: #ffffff;
+      --page: #f4f6fb;
+      --line: #d9dfeb;
+      --accent: #243b84;
+      --accent-deep: #182a65;
+      --accent-soft: #e9eeff;
+      --good: #157347;
+      --good-soft: #e4f6eb;
+      --bad: #b42318;
+      --bad-soft: #ffebe9;
+      --shadow: 0 12px 32px rgba(22, 35, 68, .08);
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--page); }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background: var(--page);
+      font: 16px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 12px;
+      min-height: 48px;
+      padding: 12px 16px;
+      color: inherit;
+      background: transparent;
+      font: inherit;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    button:focus-visible {
+      outline: 3px solid #f7b955;
+      outline-offset: 3px;
+    }
+
+    button:disabled {
+      cursor: default;
+    }
+
+    .app-shell {
+      width: min(100% - 32px, 1080px);
+      margin: 0 auto;
+      padding: 32px 0 56px;
+    }
+
+    .screen[hidden] { display: none; }
+    .screen { min-width: 0; }
+
+    .brand {
+      margin-bottom: 28px;
+      color: var(--accent);
+      font-size: .85rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      margin-bottom: 8px;
+      font-size: clamp(2rem, 6vw, 3.1rem);
+      line-height: 1.1;
+      letter-spacing: -.04em;
+    }
+    h2 {
+      margin-bottom: 8px;
+      font-size: clamp(1.45rem, 4vw, 2rem);
+      line-height: 1.2;
+      letter-spacing: -.025em;
+    }
+    h3 {
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+      line-height: 1.3;
+    }
+
+    .lede {
+      max-width: 720px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    .home-panel,
+    .content-card,
+    .question-card,
+    .summary,
+    .score-card,
+    .empty-state {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .home-panel {
+      padding: clamp(24px, 6vw, 56px);
+    }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 28px;
+    }
+
+    .mode-button,
+    .menu-button {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      min-height: 132px;
+      border: 1px solid #c7d1ef;
+      background: linear-gradient(145deg, #f9faff, #edf1ff);
+      color: var(--accent-deep);
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+    }
+
+    .mode-button:hover,
+    .menu-button:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: 0 10px 20px rgba(36, 59, 132, .13);
+    }
+
+    .button-title {
+      display: block;
+      font-size: 1.2rem;
+    }
+
+    .button-copy {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: .94rem;
+      font-weight: 500;
+      line-height: 1.45;
+    }
+
+    .screen-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .screen-head .lede { max-width: 760px; }
+
+    .nav-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .nav-button {
+      min-width: 100px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--accent-deep);
+      text-align: center;
+    }
+
+    .nav-button:hover { background: var(--accent-soft); }
+
+    .menu-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .menu-button {
+      min-height: 76px;
+      padding: 18px;
+    }
+
+    .content-card {
+      padding: clamp(20px, 4vw, 36px);
+    }
+
+    .content-section + .content-section {
+      margin-top: 32px;
+      padding-top: 30px;
+      border-top: 1px solid var(--line);
+    }
+
+    .content-section > p {
+      max-width: 790px;
+      color: var(--muted);
+    }
+
+    .term-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .term-card {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid #dce2f1;
+      border-radius: 12px;
+      background: #fbfcff;
+    }
+
+    .term-card h3 { color: var(--accent-deep); }
+    .term-card p { margin: 0; color: var(--muted); }
+
+    .note {
+      margin: 16px 0;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent);
+      border-radius: 0 10px 10px 0;
+      background: var(--accent-soft);
+      color: #26366e;
+    }
+
+    .list-title {
+      margin: 18px 0 8px;
+      color: var(--accent-deep);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .steps {
+      margin: 0;
+      padding-left: 1.45rem;
+    }
+
+    .steps li + li { margin-top: 8px; }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 16px 0;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #f1f4ff;
+      color: var(--accent-deep);
+      font-size: .92rem;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .test-top {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .score-card {
+      min-width: 200px;
+      padding: 14px 16px;
+      color: var(--accent-deep);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .test-notice {
+      margin: 0 0 20px;
+      padding: 14px 16px;
+      border: 1px solid #cbd6ff;
+      border-radius: 12px;
+      background: #f1f4ff;
+      color: #26366e;
+    }
+
+    .question-list {
+      display: grid;
+      gap: 18px;
+    }
+
+    .question-card {
+      padding: clamp(18px, 3vw, 26px);
+    }
+
+    .question-number {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-size: .9rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .question-text {
+      margin-bottom: 18px;
+      font-size: 1.08rem;
+      font-weight: 750;
+      line-height: 1.45;
+    }
+
+    .choice-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .choice {
+      width: 100%;
+      min-height: 52px;
+      border: 1px solid #cfd7e7;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 600;
+      line-height: 1.35;
+      white-space: normal;
+    }
+
+    .choice:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: #f7f8ff;
+    }
+
+    .choice.correct {
+      border-color: var(--good);
+      background: var(--good-soft);
+      color: #0b5934;
+    }
+
+    .choice.wrong {
+      border-color: var(--bad);
+      background: var(--bad-soft);
+      color: #8c1b12;
+    }
+
+    .choice:disabled { opacity: 1; }
+
+    .feedback {
+      margin: 14px 0 0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .feedback.good {
+      background: var(--good-soft);
+      color: #0b5934;
+    }
+
+    .feedback.bad {
+      background: var(--bad-soft);
+      color: #8c1b12;
+    }
+
+    .summary {
+      margin-top: 22px;
+      padding: 24px;
+      border-color: #b9c8ff;
+      background: #f6f8ff;
+    }
+
+    .summary h2 { color: var(--accent-deep); }
+    .summary p { margin-bottom: 18px; }
+
+    .primary-button {
+      min-width: 132px;
+      background: var(--accent);
+      color: #fff;
+      text-align: center;
+    }
+
+    .primary-button:hover { background: var(--accent-deep); }
+
+    .header-retake {
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    .error-box {
+      position: fixed;
+      z-index: 10;
+      right: 16px;
+      bottom: 16px;
+      max-width: min(520px, calc(100% - 32px));
+      padding: 14px 16px;
+      border: 1px solid var(--bad);
+      border-radius: 12px;
+      background: var(--bad-soft);
+      color: #7f1d1d;
+      box-shadow: var(--shadow);
+      font-weight: 700;
+    }
+
+    .empty-state { padding: 28px; }
+
+    @media (max-width: 640px) {
+      .app-shell { width: min(100% - 24px, 1080px); padding-top: 20px; }
+      .mode-grid { grid-template-columns: 1fr; }
+      .test-top { grid-template-columns: 1fr; }
+      .score-card { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <main id="app" class="app-shell">
+    <section id="screen-home" class="screen">
+      <div class="home-panel">
+        <div class="brand">Software Engineering 1</div>
+        <h1>Midterm reviewer</h1>
+        <p class="lede">Study the two Midterms handouts, then take the verified 1st Term, SY 2025-2026 Midterm Examination.</p>
+        <div class="mode-grid" aria-label="Study modes">
+          <button class="mode-button" type="button" data-action="open-handouts">
+            <span class="button-title">Handout</span>
+            <span class="button-copy">Review key terms, processes, and diagrams from the Midterms sources.</span>
+          </button>
+          <button class="mode-button" type="button" data-action="open-reviewer">
+            <span class="button-title">Reviewer</span>
+              <span class="button-copy">Answer the 35-item Midterm Examination with instant feedback.</span>
+          </button>
+        </div>
+      </div>
+    </section>
+    <section id="screen-handout-menu" class="screen" hidden></section>
+    <section id="screen-handout-detail" class="screen" hidden></section>
+    <section id="screen-reviewer-menu" class="screen" hidden></section>
+    <section id="screen-reviewer-test" class="screen" hidden></section>
+    <div id="error-box" class="error-box" role="alert" hidden></div>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var app = document.getElementById("app");
+      var errorBox = document.getElementById("error-box");
+      var screenIds = [
+        "screen-home",
+        "screen-handout-menu",
+        "screen-handout-detail",
+        "screen-reviewer-menu",
+        "screen-reviewer-test"
+      ];
+      var state = { answers: {}, activeHandout: null };
+
+      var handouts = [
+        {
+          id: "identifying-user-stories",
+          title: "Identifying the user stories and use cases [Midterms]",
+          label: "Midterm - Identifying User Stories and Use Cases",
+          intro: "Key concepts from the supplied Midterms handout.",
+          sections: [
+            {
+              title: "User stories, acceptance criteria, and use cases",
+              terms: [
+                ["User story", "States what an end-user does as part of work and describes the user's goal when using the system. It is a basic Agile concept that focuses on simplicity, added value, and user collaboration."],
+                ["User-story template", "As a <role played>, I want to <goal or desire> so that <reason or benefit>."],
+                ["Acceptance criteria", "The final part of a user story. It indicates features that must be present for the user to be satisfied with the implementation and focuses on functionality rather than user-interface design."],
+                ["Use case", "An activity the system performs in response to a request by a user."]
+              ],
+              note: "Two recommended ways to identify use cases are the user-goal technique and the event-decomposition technique."
+            },
+            {
+              title: "User-goal technique",
+              intro: "This technique identifies use cases by determining the specific goals or objectives the system must complete for users.",
+              listTitle: "Eight steps",
+              steps: [
+                "Identify all potential users for the new system.",
+                "Classify potential users by functional role, such as shipping, marketing, or sales.",
+                "Further classify potential users by organizational level, such as operational management or executive.",
+                "Interview each user type about current goals, then encourage innovative functions that would add value. State each goal in imperative verb-noun form, such as Add customer or Update order.",
+                "Create a preliminary list of use cases organized by user type.",
+                "Look for duplicate or similar use case names and resolve inconsistencies.",
+                "Identify where different user types need the same use cases.",
+                "Review the completed list with each user type and interested stakeholders."
+              ],
+              table: {
+                headers: ["Potential user", "User goal and resulting use case"],
+                rows: [
+                  ["Potential customer", "Search for item; Fill shopping cart; View product rating and comments"],
+                  ["Marketing manager", "Add/update product information; Add/update promotion; Produce sales history report"],
+                  ["Shipping personnel", "Ship order; Track shipment; Create item return"]
+                ]
+              }
+            },
+            {
+              title: "Event decomposition",
+              intro: "This technique identifies use cases by determining the business events to which the system must respond. Events happen at a specific time and place, can be described, and should be remembered by the system.",
+              terms: [
+                ["External event", "Occurs outside the system and is usually initiated by an external agent or actor. An external agent supplies or receives data from the system."],
+                ["Temporal event", "Occurs as a result of reaching a point in time. Identify it by asking about deadlines and required outputs or processing."],
+                ["State event", "Occurs when something inside the system triggers processing. It is also called an internal event and can follow an external event."],
+                ["Perfect technology assumption", "During analysis, include an event only if the system must respond under perfect conditions. Defer technology-dependent events and system controls, such as login, logout, password changes, and database backup or restore."]
+              ],
+              listTitle: "Event-decomposition steps",
+              steps: [
+                "Consider external events that require a system response by using the external-events checklist.",
+                "For each external event, identify and name the required use case.",
+                "Consider temporal events that require a response by using the temporal-events checklist.",
+                "For each temporal event, identify and name the use case and establish the time that triggers it.",
+                "Consider state events that the system might respond to, especially in real-time systems.",
+                "For each state event, identify and name the use case and define the state change.",
+                "Check defined events and use cases against the perfect technology assumption."
+              ],
+              note: "To distinguish an event from prior conditions, find the point that directly affects the system. In the shirt-buying example, the system is not affected until the customer says, “I want to buy this shirt.”"
+            },
+            {
+              title: "Use cases, actors, and use case diagrams",
+              terms: [
+                ["Brief use case description", "Often a one-sentence description that provides a quick overview of a use case."],
+                ["Use case diagram", "The UML model used to illustrate use cases and their relationships to actors."],
+                ["Automation boundary", "The boundary between the computerized part of an application and the users who operate it as part of the total system."],
+                ["Actor", "The user or other external role connected to a use case; in the diagram notation, it is represented by a stick figure."]
+              ],
+              listTitle: "Developing a use case diagram",
+              steps: [
+                "Identify all stakeholders and users who would benefit from the diagram.",
+                "Determine what each stakeholder or user needs to review. Diagrams can be made for a subsystem, a user type, <<includes>> relationships, or use cases of interest to particular stakeholders.",
+                "For each potential communication need, select the use cases and actors to show and draw the diagram.",
+                "Carefully name each diagram and note how and when it will be used to review use cases with stakeholders and users."
+              ]
+            }
+          ]
+        },
+        {
+          id: "use-case-modeling",
+          title: "Use Case Modeling (Part 1) [Midterms]",
+          label: "Midterm - Use Case Modeling (Part 1)",
+          intro: "Key concepts from the supplied Midterms handout.",
+          sections: [
+            {
+              title: "Use case descriptions",
+              terms: [
+                ["Use case description", "A textual model that lists and describes the processing details for a use case."],
+                ["Brief use case description", "Gives enough detail for very simple use cases, especially when a system is small and well understood."],
+                ["Fully developed use case description", "The most formal method for documenting a use case. It increases the probability that developers understand business processes and how the system can support them."]
+              ],
+              note: "Use case descriptions are written at two separate levels of detail: brief and fully developed."
+            },
+            {
+              title: "Fully developed use case description",
+              intro: "The standard fully developed description has ten compartments.",
+              listTitle: "The ten compartments",
+              steps: [
+                "First and second: the scenarios or use case instances, a unique set of internal activities within a use case.",
+                "Third: the event that triggers the use case.",
+                "Fourth: a brief description of the use case.",
+                "Fifth: the actor or actors.",
+                "Sixth: other use cases and how they relate to the current use case.",
+                "Seventh: stakeholders interested in the use case other than specific actors.",
+                "Eighth: preconditions, including required system state, objects, information, and actor condition before the use case begins.",
+                "Ninth: postconditions, what must be true when the use case is complete, including created or updated objects and needed associations.",
+                "Tenth: the detailed flow of activities."
+              ],
+              note: "Postconditions provide expected results for later test cases and indicate which objects are important for design."
+            },
+            {
+              title: "Activity diagrams",
+              terms: [
+                ["Activity diagram", "Documents the flow of activities for one use case. It can take the place of a use case description's flow-of-activities section or supplement that description."],
+                ["Swimlane", "A lane used to show responsibility for activities. The handout's Create customer account example has two swimlanes: customer and system."]
+              ],
+              note: "Activity diagrams can show repeating steps, decision points, and a richer user experience when related use cases are invoked."
+            },
+            {
+              title: "System sequence diagrams (SSD)",
+              terms: [
+                ["System sequence diagram", "Shows the sequence of messages between an actor and the automated part of the system during a use case or scenario. It helps identify information flowing from the user into the system and back to the user."],
+                ["Object", "Shown as a rectangle with the object's name underlined."],
+                ["Lifeline or object lifeline", "A vertical dashed line below an actor or object that extends the object during the use case."],
+                ["Message", "An action invoked on the destination object. Its label describes the purpose and input data, using verb-noun syntax for clarity."]
+              ],
+              listTitle: "Frames and notation",
+              steps: [
+                "A loop frame shows repeating messages. An asterisk indicates repetition or looping.",
+                "Square brackets show a true/false condition for a message. If the condition is true, the message is sent.",
+                "An opt frame is used when a message or series of messages is optional or based on a true/false condition.",
+                "An alt frame is used with if-then-else logic.",
+                "A parameter list shows data passed with a message. A return value on the same line as the message describes returned data."
+              ],
+              listTitleTwo: "Developing an SSD from an activity diagram",
+              stepsTwo: [
+                "Identify the input message.",
+                "Describe the message from the external actor to the system using message notation.",
+                "Identify and add special conditions on input messages, including iteration and true/false conditions.",
+                "Identify and add the output return message."
+              ]
+            }
+          ]
+        }
+      ];
+
+      var questions = [
+        { number: 1, prompt: "It is an activity the system performs in response to a request by a user.", choices: ["Acceptance Criteria", "Use Case", "User Goal Technique", "Event Decomposition Technique"], answer: 1 },
+        { number: 2, prompt: "It is the most formal method for documenting a use case.", choices: ["Brief use case description", "Fully developed use case description", "User goal technique", "Event decomposition technique"], answer: 1 },
+        { number: 3, prompt: "It is the final part of a user story.", choices: ["Acceptance Criteria", "Use Case", "User Goal Technique", "Event Decomposition Technique"], answer: 0 },
+        { number: 4, prompt: "It describes a goal the user has when using the system.", choices: ["Acceptance Criteria", "Event Decomposition Technique", "User Goal Technique", "User Story"], answer: 3 },
+        { number: 5, prompt: "This use case description increases the probability of understanding the business processes.", choices: ["Brief use case description", "Fully developed use case description", "User goal technique", "Event decomposition technique"], answer: 1 },
+        { number: 6, prompt: "These are events that occur as a result of reaching a point in time.", choices: ["External events", "Temporal events", "State events", "Internal events"], answer: 1 },
+        { number: 7, prompt: "Which event type is also known as internal events?", choices: ["External events", "Temporal events", "State events", "Sequential events"], answer: 2 },
+        { number: 8, prompt: "These identify the state of the system for the use case to begin.", choices: ["Brief use case description", "Fully developed use case description", "Preconditions", "Postconditions"], answer: 2 },
+        { number: 9, prompt: "These are events that occur outside the system.", choices: ["External events", "Temporal events", "State events", "Internal events"], answer: 0 },
+        { number: 10, prompt: "They are sometimes similar to temporal events, except the point in time cannot be defined.", choices: ["External events", "State events", "Sequential events", "System events"], answer: 1 },
+        { number: 11, prompt: "It is a textual model that lists and describes the processing details for a use case.", choices: ["User story", "User goal technique", "Use case description", "Activity diagram"], answer: 2 },
+        { number: 12, prompt: "This diagram identifies the specific information that flows from the user into the system and the information that flows out of the system back to the user.", choices: ["Activity diagram", "System sequence diagram", "Class diagram", "Component diagram"], answer: 1 },
+        { number: 13, prompt: "These are events that occur when something happens inside the system that triggers the need for processing.", choices: ["External events", "Temporal events", "State events", "Sequential events"], answer: 2 },
+        { number: 14, prompt: "These identify what must be true upon completion of the use case.", choices: ["Brief use case descriptions", "Fully developed use case descriptions", "Preconditions", "Postconditions"], answer: 3 },
+        { number: 15, prompt: "This use case description gives enough detail for very simple use cases.", choices: ["Brief use case description", "Fully developed use case description", "User goal technique", "Event decomposition technique"], answer: 0 },
+        { number: 16, prompt: "Which user goal/use case is appropriate for the shipping personnel?", choices: ["Fill shopping cart", "Add/update product information", "Produce sales history report", "Create item return"], answer: 3 },
+        { number: 17, prompt: "Which of the following steps in developing a system sequence diagram comes first?", choices: ["Identify and add the output return message.", "Describe the message from the external actor to the system.", "Identify and add any special conditions on the input messages.", "Identify the input message."], answer: 3 },
+        { number: 18, prompt: "Which user goal/use case is appropriate for a potential customer?", choices: ["Ship order", "Fill shopping cart", "Add/update product information", "Create item return"], answer: 1 },
+        { number: 19, prompt: "Which of the following steps in the user goal technique comes first?", choices: ["Classify the potential users in terms of their functional role.", "Identify all the potential users for the new system.", "Interview each type of user to determine the specific goals they will have.", "Further classify potential users by organizational level."], answer: 1 },
+        { number: 20, prompt: "This event type is identified by asking questions such as \"What output are produced at that deadline\"?", choices: ["External event", "Temporal event", "State event", "Internal event"], answer: 1 },
+        { number: 21, prompt: "Which of the following steps in the development of a use case diagram comes last?", choices: ["Determine what each stakeholder or user needs to review in a use case diagram.", "For each potential communication need, select the use cases and actors to show and draw the use case diagram.", "Identify all the stakeholders and users who would benefit from having a use case diagram.", "Note how and when the diagram should be used to review use cases with stakeholders and users."], answer: 3 },
+        { number: 22, prompt: "Which of the following can be written as a triggering event in the use case description?", choices: ["Create customer account.", "New customer wants to set up account online.", "Accounting, Marketing, Sales", "Customer"], answer: 1 },
+        { number: 23, prompt: "Which of the following can be written as a precondition in the use case description?", choices: ["Customer Account subsystem must be available.", "Basic customer data are incomplete.", "New customer wants to set up account online.", "The address is not valid."], answer: 0 },
+        { number: 24, prompt: "Which of the following steps in developing a system sequence diagram comes last?", choices: ["Identify and add the output return message.", "Describe the message from the external actor to the system.", "Identify and add any special conditions on the input messages.", "Identify the input message."], answer: 0 },
+        { number: 25, prompt: "Which of the following is a use case name for a use case description?", choices: ["Create customer account.", "New customers want to set up account online.", "Accounting, Marketing, Sales", "Customer"], answer: 0 },
+        { number: 26, prompt: "Which of the following can be written as a postcondition in a use case description?", choices: ["The address is not valid.", "Basic customer data are incomplete.", "New customer wants to set up account online.", "Customer must be created and saved."], answer: 3 },
+        { number: 27, prompt: "For a Create Customer Account use case, which of the following can be written as stakeholders in the use case description?", choices: ["Accounting, Marketing, Sales", "New customer wants to set up account online.", "Basic customer data are incomplete.", "Customer"], answer: 0 },
+        { number: 28, prompt: "Which of the following steps in developing a use case diagram comes first?", choices: ["Determine what each stakeholder or user needs to review in a use case diagram.", "For each potential communication need, select the use cases and actors to show and draw the use case diagram.", "Identify all the stakeholders and users who would benefit from having a use case diagram.", "Note how and when the diagram should be used to review use cases with stakeholders and users."], answer: 2 },
+        { number: 29, prompt: "Which user goal/use case is appropriate for a marketing manager?", choices: ["Fill shopping cart", "Add/update product information", "Ship order", "Create item return"], answer: 1 },
+        { number: 30, prompt: "Which of the following steps in the user goal technique comes last?", choices: ["Classify the potential users in terms of their functional role.", "Further classify potential users by organizational level.", "Interview each type of user to determine the specific goals they will have when using the new system.", "Identify all the potential users for the new system."], answer: 2 },
+        { number: 31, prompt: "In the event decomposition technique, which factor distinguishes an event from a prior condition that merely leads to it?", choices: ["Whether the occurrence directly affects the system at a specific point", "Whether the analyst can identify an external actor involved", "Whether the event produces both internal and external outputs", "Whether the system's automation boundary can contain the occurrence"], answer: 0 },
+        { number: 32, prompt: "When applying the user goal technique to identify use cases, which step ensures alignment between the system and stakeholder needs?", choices: ["Resolving inconsistencies among duplicate use case names", "Mapping state events to technical constraints", "Ignoring innovative functions suggested by users", "Listing system controls like login and backup as mandatory use cases"], answer: 0 },
+        { number: 33, prompt: "In use case modeling, which of the following is the primary purpose of an automation boundary?", choices: ["To divide core business processes from support processes", "To represent which actors must be physically present for transactions", "To separate computerized system functions from manual user roles", "To enforce synchronization among multiple subsystems"], answer: 2 },
+        { number: 34, prompt: "In sequence diagram modeling, what is the main difference between using an opt frame and an alt frame?", choices: ["Opt frames capture looping operations, while alt frames show decision branches.", "Opt frames handle optional actions under true/false conditions, while alt frames model if-then-else logic.", "Opt frames represent parallel processing, while alt frames represent sequential processing.", "Opt frames are limited to return values, while alt frames require parameter lists."], answer: 1 },
+        { number: 35, prompt: "Why are postconditions considered critical in fully developed use case descriptions beyond documenting system changes?", choices: ["They provide the names of actors who complete the transaction.", "They identify duplicate use cases for merging during design.", "They establish the expected results that become the basis of test cases.", "They simplify user stories into brief descriptive templates."], answer: 2 }
+      ];
+
+      function createElement(tagName, className, text) {
+        var node = document.createElement(tagName);
+        if (className) {
+          node.className = className;
+        }
+        if (typeof text === "string") {
+          node.textContent = text;
+        }
+        return node;
+      }
+
+      function clearElement(node) {
+        if (!node) {
+          throw new Error("A required screen could not be found.");
+        }
+        while (node.firstChild) {
+          node.removeChild(node.firstChild);
+        }
+      }
+
+      function showError(message) {
+        if (!errorBox) {
+          return;
+        }
+        errorBox.textContent = message;
+        errorBox.hidden = false;
+      }
+
+      function clearError() {
+        if (errorBox) {
+          errorBox.hidden = true;
+          errorBox.textContent = "";
+        }
+      }
+
+      function showScreen(id) {
+        try {
+          var requested = document.getElementById(id);
+          if (!requested) {
+            throw new Error("The requested screen is unavailable.");
+          }
+          screenIds.forEach(function (screenId) {
+            var screen = document.getElementById(screenId);
+            if (!screen) {
+              throw new Error("A reviewer screen is unavailable.");
+            }
+            screen.hidden = screenId !== id;
+          });
+          clearError();
+          window.scrollTo(0, 0);
+        } catch (error) {
+          showError("Unable to open that screen. Please return Home and try again.");
+        }
+      }
+
+      function makeButton(label, className, action, go) {
+        var button = createElement("button", className, label);
+        button.type = "button";
+        if (action) {
+          button.setAttribute("data-action", action);
+        }
+        if (go) {
+          button.setAttribute("data-go", go);
+        }
+        return button;
+      }
+
+      function addNav(container, backTarget) {
+        var nav = createElement("nav", "nav-row");
+        nav.setAttribute("aria-label", "Page navigation");
+        nav.appendChild(makeButton("Home", "nav-button", null, "screen-home"));
+        nav.appendChild(makeButton("Back", "nav-button", null, backTarget));
+        container.appendChild(nav);
+      }
+
+      function addTerms(container, terms) {
+        if (!terms || !terms.length) {
+          return;
+        }
+        var grid = createElement("div", "term-grid");
+        terms.forEach(function (term) {
+          var card = createElement("article", "term-card");
+          card.appendChild(createElement("h3", null, term[0]));
+          card.appendChild(createElement("p", null, term[1]));
+          grid.appendChild(card);
+        });
+        container.appendChild(grid);
+      }
+
+      function addSteps(container, title, steps) {
+        if (!steps || !steps.length) {
+          return;
+        }
+        if (title) {
+          container.appendChild(createElement("p", "list-title", title));
+        }
+        var list = createElement("ol", "steps");
+        steps.forEach(function (step) {
+          list.appendChild(createElement("li", null, step));
+        });
+        container.appendChild(list);
+      }
+
+      function addTable(container, tableData) {
+        if (!tableData) {
+          return;
+        }
+        var wrap = createElement("div", "table-wrap");
+        var table = document.createElement("table");
+        var thead = document.createElement("thead");
+        var headerRow = document.createElement("tr");
+        tableData.headers.forEach(function (header) {
+          headerRow.appendChild(createElement("th", null, header));
+        });
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        var tbody = document.createElement("tbody");
+        tableData.rows.forEach(function (row) {
+          var tr = document.createElement("tr");
+          row.forEach(function (cell) {
+            tr.appendChild(createElement("td", null, cell));
+          });
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        wrap.appendChild(table);
+        container.appendChild(wrap);
+      }
+
+      function renderHandoutMenu() {
+        try {
+          var screen = document.getElementById("screen-handout-menu");
+          clearElement(screen);
+          var header = createElement("div", "screen-head");
+          var copy = createElement("div");
+          copy.appendChild(createElement("div", "brand", "Handout"));
+          copy.appendChild(createElement("h1", null, "Midterm handouts"));
+          copy.appendChild(createElement("p", "lede", "Choose a supplied Midterms handout to review."));
+          header.appendChild(copy);
+          screen.appendChild(header);
+          var list = createElement("div", "menu-list");
+          handouts.forEach(function (handout) {
+            var button = makeButton("", "menu-button", "open-handout", null);
+            button.setAttribute("data-handout", handout.id);
+            var title = createElement("span", "button-title", handout.title);
+            var description = createElement("span", "button-copy", "Open the Midterm review notes.");
+            button.appendChild(title);
+            button.appendChild(description);
+            list.appendChild(button);
+          });
+          screen.appendChild(list);
+          addNav(screen, "screen-home");
+        } catch (error) {
+          showError("Unable to prepare the handout menu. Please return Home and try again.");
+        }
+      }
+
+      function renderHandout(id) {
+        try {
+          var handout = handouts.find(function (entry) { return entry.id === id; });
+          if (!handout) {
+            throw new Error("The selected handout is unavailable.");
+          }
+          state.activeHandout = id;
+          var screen = document.getElementById("screen-handout-detail");
+          clearElement(screen);
+          var card = createElement("article", "content-card");
+          card.appendChild(createElement("div", "brand", "Handout"));
+          card.appendChild(createElement("h1", null, handout.label));
+          card.appendChild(createElement("p", "lede", handout.intro));
+          handout.sections.forEach(function (sectionData) {
+            var section = createElement("section", "content-section");
+            section.appendChild(createElement("h2", null, sectionData.title));
+            if (sectionData.intro) {
+              section.appendChild(createElement("p", null, sectionData.intro));
+            }
+            addTerms(section, sectionData.terms);
+            if (sectionData.note) {
+              section.appendChild(createElement("p", "note", sectionData.note));
+            }
+            addSteps(section, sectionData.listTitle, sectionData.steps);
+            addSteps(section, sectionData.listTitleTwo, sectionData.stepsTwo);
+            addTable(section, sectionData.table);
+            card.appendChild(section);
+          });
+          screen.appendChild(card);
+          addNav(screen, "screen-handout-menu");
+        } catch (error) {
+          showError("Unable to open that handout. Please return to the handout menu and try again.");
+        }
+      }
+
+      function renderReviewerMenu() {
+        try {
+          var screen = document.getElementById("screen-reviewer-menu");
+          clearElement(screen);
+          var header = createElement("div", "screen-head");
+          var copy = createElement("div");
+          copy.appendChild(createElement("div", "brand", "Reviewer"));
+          copy.appendChild(createElement("h1", null, "Midterm practice test"));
+          copy.appendChild(createElement("p", "lede", "Choose the available Midterm reviewer."));
+          header.appendChild(copy);
+          screen.appendChild(header);
+          var list = createElement("div", "menu-list");
+          var button = makeButton("", "menu-button", "start-test", null);
+          button.appendChild(createElement("span", "button-title", "Midterm Reviewer"));
+          button.appendChild(createElement("span", "button-copy", "35-item 1st Term, SY 2025-2026 Midterm Examination with answers checked against the supplied Midterm handouts."));
+          list.appendChild(button);
+          screen.appendChild(list);
+          addNav(screen, "screen-home");
+        } catch (error) {
+          showError("Unable to prepare the reviewer menu. Please return Home and try again.");
+        }
+      }
+
+      function getScore() {
+        var answered = Object.keys(state.answers).length;
+        var correct = 0;
+        Object.keys(state.answers).forEach(function (key) {
+          var questionIndex = Number(key);
+          if (questions[questionIndex] && state.answers[key] === questions[questionIndex].answer) {
+            correct += 1;
+          }
+        });
+        return { answered: answered, correct: correct, total: questions.length };
+      }
+
+      function renderQuestion(question, questionIndex) {
+        var card = createElement("article", "question-card");
+        card.appendChild(createElement("p", "question-number", "Question " + question.number + " of " + questions.length));
+        card.appendChild(createElement("p", "question-text", question.prompt));
+        var choices = createElement("div", "choice-list");
+        choices.setAttribute("role", "group");
+        choices.setAttribute("aria-label", "Choices for question " + question.number);
+        var answered = Object.prototype.hasOwnProperty.call(state.answers, questionIndex);
+        var selected = state.answers[questionIndex];
+        question.choices.forEach(function (choice, choiceIndex) {
+          var choiceButton = makeButton("", "choice", "answer-question", null);
+          choiceButton.setAttribute("data-question", String(questionIndex));
+          choiceButton.setAttribute("data-choice", String(choiceIndex));
+          choiceButton.setAttribute("aria-label", "Choice " + String.fromCharCode(65 + choiceIndex) + ": " + choice);
+          choiceButton.textContent = String.fromCharCode(65 + choiceIndex) + ". " + choice;
+          if (answered) {
+            choiceButton.disabled = true;
+            if (choiceIndex === question.answer) {
+              choiceButton.classList.add("correct");
+            }
+            if (choiceIndex === selected && selected !== question.answer) {
+              choiceButton.classList.add("wrong");
+            }
+          }
+          choices.appendChild(choiceButton);
+        });
+        card.appendChild(choices);
+        if (answered) {
+          var feedback = createElement("p", "feedback");
+          if (selected === question.answer) {
+            feedback.classList.add("good");
+            feedback.textContent = "Correct.";
+          } else {
+            feedback.classList.add("bad");
+            feedback.textContent = "Not quite. Correct answer: " + String.fromCharCode(65 + question.answer) + ". " + question.choices[question.answer];
+          }
+          feedback.setAttribute("aria-live", "polite");
+          card.appendChild(feedback);
+        }
+        return card;
+      }
+
+      function renderTest() {
+        try {
+          var screen = document.getElementById("screen-reviewer-test");
+          clearElement(screen);
+          var score = getScore();
+          var top = createElement("div", "test-top");
+          var heading = createElement("div");
+          heading.appendChild(createElement("div", "brand", "Reviewer"));
+          heading.appendChild(createElement("h1", null, "Midterm Reviewer"));
+          heading.appendChild(createElement("p", "lede", "Answer each question once. Feedback appears immediately and the item then locks."));
+          top.appendChild(heading);
+          var scoreCard = createElement("div", "score-card");
+          scoreCard.appendChild(createElement("div", null, "Score: " + score.correct + " correct / " + score.answered + " answered / " + score.total + " total"));
+          scoreCard.appendChild(makeButton("Retake", "primary-button header-retake", "retake-test", null));
+          top.appendChild(scoreCard);
+          screen.appendChild(top);
+          screen.appendChild(createElement("p", "test-notice", "A. (35 Items x 2 points)"));
+          screen.appendChild(createElement("p", "test-notice", "This is the actual 1st Term, SY 2025-2026 Midterm Examination. Its answer key was checked against the two Midterm handouts."));
+          var list = createElement("section", "question-list");
+          list.setAttribute("aria-label", "Midterm practice questions");
+          questions.forEach(function (question, questionIndex) {
+            list.appendChild(renderQuestion(question, questionIndex));
+          });
+          screen.appendChild(list);
+          if (score.answered === score.total) {
+            var summary = createElement("section", "summary");
+            summary.setAttribute("aria-live", "polite");
+            summary.appendChild(createElement("h2", null, "Practice test complete"));
+            summary.appendChild(createElement("p", null, "Final score: " + score.correct + " out of " + score.total + "."));
+            summary.appendChild(makeButton("Retake", "primary-button", "retake-test", null));
+            screen.appendChild(summary);
+          }
+          addNav(screen, "screen-home");
+        } catch (error) {
+          showError("Unable to render the practice test. Please return to the reviewer menu and try again.");
+        }
+      }
+
+      function answerQuestion(questionIndex, choiceIndex) {
+        try {
+          if (!Number.isInteger(questionIndex) || !Number.isInteger(choiceIndex) || !questions[questionIndex] || !questions[questionIndex].choices[choiceIndex]) {
+            throw new Error("That answer is not available.");
+          }
+          if (Object.prototype.hasOwnProperty.call(state.answers, questionIndex)) {
+            return;
+          }
+          state.answers[questionIndex] = choiceIndex;
+          renderTest();
+        } catch (error) {
+          showError("Unable to record that answer. Please choose an available option.");
+        }
+      }
+
+      function startTest() {
+        state.answers = {};
+        renderTest();
+        showScreen("screen-reviewer-test");
+      }
+
+      app.addEventListener("click", function (event) {
+        var button = event.target.closest("button[data-action], button[data-go]");
+        if (!button || !app.contains(button) || button.disabled) {
+          return;
+        }
+        try {
+          var go = button.getAttribute("data-go");
+          if (go) {
+            showScreen(go);
+            return;
+          }
+          var action = button.getAttribute("data-action");
+          if (action === "open-handouts") {
+            renderHandoutMenu();
+            showScreen("screen-handout-menu");
+          } else if (action === "open-handout") {
+            renderHandout(button.getAttribute("data-handout"));
+            showScreen("screen-handout-detail");
+          } else if (action === "open-reviewer") {
+            startTest();
+          } else if (action === "start-test") {
+            startTest();
+          } else if (action === "answer-question") {
+            answerQuestion(Number(button.getAttribute("data-question")), Number(button.getAttribute("data-choice")));
+          } else if (action === "retake-test") {
+            state.answers = {};
+            renderTest();
+          } else {
+            throw new Error("That action is unavailable.");
+          }
+        } catch (error) {
+          showError("That control could not be completed. Please return Home and try again.");
+        }
+      });
+    }());
+  </script>
+</body>
+</html>
